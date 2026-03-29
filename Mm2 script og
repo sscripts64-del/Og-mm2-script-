@@ -1,0 +1,743 @@
+getgenv().Resolution = { [".gg/scripters"] = 0.65 }
+
+-- ⚡ GOD HUB PRO4x4 FULLSCREEN (MM2) + KEY SYSTEM (NO SAVE) + 24H KEY STORAGE
+
+local UIS = game:GetService("UserInputService")
+
+local CoreGui = game:GetService("CoreGui")
+
+local RunService = game:GetService("RunService")
+
+local Lighting = game:GetService("Lighting")
+
+local HttpService = game:GetService("HttpService")
+
+pcall(function()
+
+    CoreGui.GODHub:Destroy()
+
+    CoreGui.GODKeyGui:Destroy()
+
+end)
+
+-- 🔑 KEY CONFIG
+
+local CorrectKey = "OG"
+
+-- 💾 FUNCIÓN PARA GUARDAR LA KEY CON TIMESTAMP
+
+local function saveKeyData()
+
+    local keyData = {
+
+        key = CorrectKey,
+
+        timestamp = os.time() -- Guarda el tiempo actual en segundos
+
+    }
+
+    local jsonData = HttpService:JSONEncode(keyData)
+
+    writefile("GODHub_KeyData.json", jsonData) -- Guarda en un archivo JSON
+
+end
+
+-- 🔍 FUNCIÓN PARA VERIFICAR SI LA KEY SIGUE VÁLIDA (24 HORAS)
+
+local function isKeyValid()
+
+    if not isfile("GODHub_KeyData.json") then
+
+        return false -- No hay archivo guardado
+
+    end
+
+    
+
+    local success, jsonData = pcall(function()
+
+        return readfile("GODHub_KeyData.json")
+
+    end)
+
+    
+
+    if not success then
+
+        return false
+
+    end
+
+    
+
+    local success, keyData = pcall(function()
+
+        return HttpService:JSONDecode(jsonData)
+
+    end)
+
+    
+
+    if not success or not keyData or not keyData.timestamp then
+
+        return false
+
+    end
+
+    
+
+    local currentTime = os.time()
+
+    local timeDiff = currentTime - keyData.timestamp -- Diferencia en segundos
+
+    local hoursPassed = timeDiff / 3600 -- Convertir a horas
+
+    
+
+    -- Verificar si han pasado menos de 24 horas
+
+    return hoursPassed < 24
+
+end
+
+-- DRAG FUNCTION
+
+local function Drag(gui)
+
+    local dragging, dragStart, startPos
+
+    gui.Active = true
+
+    gui.InputBegan:Connect(function(input)
+
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+
+            dragging = true
+
+            dragStart = input.Position
+
+            startPos = gui.Position
+
+        end
+
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+
+        if dragging then
+
+            local delta = input.Position - dragStart
+
+            gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+
+                                     startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+
+        end
+
+    end)
+
+    UIS.InputEnded:Connect(function()
+
+        dragging = false
+
+    end)
+
+end
+
+-- ================= HUB =================
+
+local function LoadHub()
+
+    local Gui = Instance.new("ScreenGui", CoreGui)
+
+    Gui.Name = "GODHub"
+
+    Gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+    local Blur = Instance.new("BlurEffect", Lighting)
+
+    Blur.Size = 0
+
+    -- OPEN BUTTON
+
+    local OpenButton = Instance.new("TextButton", Gui)
+
+    OpenButton.Size = UDim2.new(0,90,0,90)
+
+    OpenButton.Position = UDim2.new(0,20,0.45,0)
+
+    OpenButton.Text = "☄️"
+
+    OpenButton.TextSize = 45
+
+    OpenButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
+
+    OpenButton.TextColor3 = Color3.fromRGB(255,255,255)
+
+    OpenButton.ZIndex = 9999
+
+    Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1,0)
+
+    RunService.RenderStepped:Connect(function()
+
+        OpenButton.Rotation += 2
+
+    end)
+
+    -- MAIN FRAME
+
+    local Frame = Instance.new("Frame", Gui)
+
+    Frame.Size = UDim2.new(1,0,1,0)
+
+    Frame.BackgroundColor3 = Color3.fromRGB(10,10,10)
+
+    Frame.BackgroundTransparency = 0.1
+
+    Frame.Visible = false
+
+    Frame.ZIndex = 1
+
+    local Stroke = Instance.new("UIStroke", Frame)
+
+    Stroke.Thickness = 3
+
+    task.spawn(function()
+
+        while true do
+
+            for i = 0,1,0.01 do
+
+                Stroke.Color = Color3.fromHSV(i,1,1)
+
+                task.wait()
+
+            end
+
+        end
+
+    end)
+
+    -- Título principal
+
+    local Title = Instance.new("TextLabel", Frame)
+
+    Title.Size = UDim2.new(1,0,0,80)
+
+    Title.Text = "OG HUB FULLSCREEN BY SCRIPT"
+
+    Title.Font = Enum.Font.GothamBold
+
+    Title.TextSize = 30
+
+    Title.TextColor3 = Color3.new(1,1,1)
+
+    Title.BackgroundTransparency = 1
+
+    -- BOTÓN CREDITOS EN LA ESQUINA SUPERIOR DERECHA
+
+    local CreditosBtn = Instance.new("TextButton", Frame)
+
+    CreditosBtn.Size = UDim2.new(0, 120, 0, 35)
+
+    CreditosBtn.Position = UDim2.new(1, -130, 0, 10)
+
+    CreditosBtn.Text = "📋 CREDITOS"
+
+    CreditosBtn.Font = Enum.Font.GothamBold
+
+    CreditosBtn.TextSize = 16
+
+    CreditosBtn.TextColor3 = Color3.new(1, 1, 1)
+
+    CreditosBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 100)
+
+    CreditosBtn.BorderSizePixel = 0
+
+    CreditosBtn.ZIndex = 10
+
+    
+
+    local CreditosCorner = Instance.new("UICorner")
+
+    CreditosCorner.Parent = CreditosBtn
+
+    CreditosCorner.CornerRadius = UDim.new(0, 10)
+
+    CreditosBtn.MouseEnter:Connect(function()
+
+        CreditosBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 150)
+
+    end)
+
+    CreditosBtn.MouseLeave:Connect(function()
+
+        CreditosBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 100)
+
+    end)
+
+    local Scroll = Instance.new("ScrollingFrame", Frame)
+
+    Scroll.Size = UDim2.new(1,0,1,-100)
+
+    Scroll.Position = UDim2.new(0,0,0,90)
+
+    Scroll.ScrollBarThickness = 8
+
+    Scroll.BackgroundTransparency = 1
+
+    local UIList = Instance.new("UIListLayout", Scroll)
+
+    UIList.Padding = UDim.new(0,12)
+
+    UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    UIList.SortOrder = Enum.SortOrder.LayoutOrder
+
+    UIList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+
+        Scroll.CanvasSize = UDim2.new(0,0,0,UIList.AbsoluteContentSize.Y + 20)
+
+    end)
+
+    local function Btn(text, order)
+
+        local b = Instance.new("TextButton", Scroll)
+
+        b.Size = UDim2.new(0.9,0,0,80)
+
+        b.Text = text
+
+        b.Font = Enum.Font.GothamBold
+
+        b.TextSize = 22
+
+        b.TextColor3 = Color3.new(1,1,1)
+
+        b.BackgroundColor3 = Color3.fromRGB(30,30,30)
+
+        b.LayoutOrder = order or 0
+
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0,18)
+
+        return b
+
+    end
+
+    -- Crear botones principales en orden
+
+    local AutoFarmBtn  = Btn("🤖 AUTO FARM MM2", 1)
+
+    local WeaponsBtn    = Btn("🔫 WEAPONS GENERATOR", 2)
+
+    local ProjectReverseBtn = Btn("🔄 PROJECT REVERSE [MM2]", 3)
+
+    
+
+    -- Los botones originales
+
+    local Hitbox        = Btn("🎯 HITBOX", 4)
+
+    local Yarhm         = Btn("🔫 YARHM", 5)
+
+    local Speed         = Btn("⚡ SPEED GLITCH", 6)
+
+    local Infinite      = Btn("♾️ INFINITE YIELD", 7)
+
+    local FlyV3         = Btn("🕊️ FLY V3", 8)
+
+    local ResBtn        = Btn("📺 1080x1080", 9)
+
+    OpenButton.MouseButton1Click:Connect(function()
+
+        Frame.Visible = not Frame.Visible
+
+        Blur.Size = Frame.Visible and 35 or 0
+
+    end)
+
+    Drag(OpenButton)
+
+    Drag(Frame)
+
+    local function SafeLoad(url)
+
+        pcall(function()
+
+            loadstring(game:HttpGet(url))()
+
+        end)
+
+    end
+
+    Hitbox.MouseButton1Click:Connect(function()
+
+        SafeLoad("https://pastefy.app/ItfO0tdg/raw")
+
+    end)
+
+    Yarhm.MouseButton1Click:Connect(function()
+
+        SafeLoad("https://rawscripts.net/raw/Murder-Mystery-2-MM-AUTO-SHOOT-15532")
+
+    end)
+
+    Speed.MouseButton1Click:Connect(function()
+
+        SafeLoad("https://rawscripts.net/raw/Universal-Script-SpeedGlitch-OP-48479")
+
+    end)
+
+    Infinite.MouseButton1Click:Connect(function()
+
+        SafeLoad("https://rawscripts.net/raw/Universal-Script-Infinite-Yield-103818")
+
+    end)
+
+    FlyV3.MouseButton1Click:Connect(function()
+
+        SafeLoad("https://rawscripts.net/raw/Universal-Script-Fly-v3-102059")
+
+    end)
+
+    -- ✅ SCRIPT 1080x1080
+
+    ResBtn.MouseButton1Click:Connect(function()
+
+        getgenv().Resolution = { [".gg/scripters"] = 0.65 }
+
+        local Camera = workspace.CurrentCamera
+
+        if getgenv().gg_scripters == nil then
+
+            game:GetService("RunService").RenderStepped:Connect(function()
+
+                Camera.CFrame = Camera.CFrame * CFrame.new(
+
+                    0, 0, 0,
+
+                    1, 0, 0,
+
+                    0, getgenv().Resolution[".gg/scripters"], 0,
+
+                    0, 0, 1
+
+                )
+
+            end)""
+
+        end
+
+        getgenv().gg_scripters = "Aori0001"
+
+    end)
+
+    -- ✅ BOTÓN AUTO FARM MM2
+
+    AutoFarmBtn.MouseButton1Click:Connect(function()
+
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/elmoHUB/x/refs/heads/main/MM2-Menu"))()
+
+    end)
+
+    -- ✅ BOTÓN WEAPONS GENERATOR
+
+    WeaponsBtn.MouseButton1Click:Connect(function()
+
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/RobloxScriptBY/MM2/refs/heads/main/ItemSpawner.lua"))()
+
+    end)
+
+    -- ✅ BOTÓN PROJECT REVERSE [MM2]
+
+    ProjectReverseBtn.MouseButton1Click:Connect(function()
+
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Free-Keyless-Script/MurderMystery2/refs/heads/main/Main.lua"))()
+
+    end)
+
+    -- ✅ BOTÓN CREDITOS
+
+    CreditosBtn.MouseButton1Click:Connect(function()
+
+        local CreditosGui = Instance.new("ScreenGui")
+
+        CreditosGui.Parent = CoreGui
+
+        CreditosGui.Name = "CreditosGui"
+
+        CreditosGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+        local CreditosFrame = Instance.new("Frame")
+
+        CreditosFrame.Parent = CreditosGui
+
+        CreditosFrame.Size = UDim2.new(0, 300, 0, 120)
+
+        CreditosFrame.Position = UDim2.new(0.5, -150, 0.5, -60)
+
+        CreditosFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+
+        CreditosFrame.BackgroundTransparency = 0.1
+
+        CreditosFrame.BorderSizePixel = 0
+
+        CreditosFrame.Active = true
+
+        CreditosFrame.Draggable = true
+
+        local CreditosCorner = Instance.new("UICorner")
+
+        CreditosCorner.Parent = CreditosFrame
+
+        CreditosCorner.CornerRadius = UDim.new(0, 15)
+
+        local CreditosStroke = Instance.new("UIStroke")
+
+        CreditosStroke.Parent = CreditosFrame
+
+        CreditosStroke.Thickness = 2
+
+        CreditosStroke.Color = Color3.fromRGB(0, 255, 255)
+
+        local CreditosTitle = Instance.new("TextLabel")
+
+        CreditosTitle.Parent = CreditosFrame
+
+        CreditosTitle.Size = UDim2.new(1, 0, 0, 30)
+
+        CreditosTitle.Position = UDim2.new(0, 0, 0, 5)
+
+        CreditosTitle.Text = "👑 CRÉDITOS 👑"
+
+        CreditosTitle.Font = Enum.Font.GothamBold
+
+        CreditosTitle.TextSize = 20
+
+        CreditosTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        CreditosTitle.BackgroundTransparency = 1
+
+        local ContentFrame = Instance.new("Frame")
+
+        ContentFrame.Parent = CreditosFrame
+
+        ContentFrame.Size = UDim2.new(1, -20, 0, 50)
+
+        ContentFrame.Position = UDim2.new(0, 10, 0, 40)
+
+        ContentFrame.BackgroundTransparency = 1
+
+        local TikTikLogo = Instance.new("TextLabel")
+
+        TikTikLogo.Parent = ContentFrame
+
+        TikTikLogo.Size = UDim2.new(0, 40, 0, 40)
+
+        TikTikLogo.Position = UDim2.new(0, 0, 0.5, -20)
+
+        TikTikLogo.Text = "📱"
+
+        TikTikLogo.Font = Enum.Font.SourceSans
+
+        TikTikLogo.TextSize = 35
+
+        TikTikLogo.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+        TikTikLogo.BackgroundTransparency = 1
+
+        local NombreLabel = Instance.new("TextLabel")
+
+        NombreLabel.Parent = ContentFrame
+
+        NombreLabel.Size = UDim2.new(1, -50, 1, 0)
+
+        NombreLabel.Position = UDim2.new(0, 50, 0, 0)
+
+        NombreLabel.Text = "@Scripts"
+
+        NombreLabel.Font = Enum.Font.GothamBold
+
+        NombreLabel.TextSize = 18
+
+        NombreLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
+
+        NombreLabel.BackgroundTransparency = 1
+
+        NombreLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+        local CloseBtn = Instance.new("TextButton")
+
+        CloseBtn.Parent = CreditosFrame
+
+        CloseBtn.Size = UDim2.new(0, 60, 0, 25)
+
+        CloseBtn.Position = UDim2.new(0.5, -30, 0, 85)
+
+        CloseBtn.Text = "CERRAR"
+
+        CloseBtn.Font = Enum.Font.GothamBold
+
+        CloseBtn.TextSize = 14
+
+        CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+
+        CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+
+        CloseBtn.BorderSizePixel = 0
+
+        local CloseCorner = Instance.new("UICorner")
+
+        CloseCorner.Parent = CloseBtn
+
+        CloseCorner.CornerRadius = UDim.new(0, 8)
+
+        CloseBtn.MouseButton1Click:Connect(function()
+
+            CreditosGui:Destroy()
+
+        end)
+
+        Drag(CreditosFrame)
+
+    end)
+
+end
+
+-- ================= KEY GUI CON VERIFICACIÓN DE 24 HORAS =================
+
+local function KeyGui()
+
+    -- Verificar si ya hay una key válida guardada
+
+    if isKeyValid() then
+
+        -- Si la key sigue siendo válida, cargar el hub directamente
+
+        LoadHub()
+
+        return
+
+    end
+
+    
+
+    -- Si no hay key válida, mostrar el GUI de key
+
+    local Gui = Instance.new("ScreenGui", CoreGui)
+
+    Gui.Name = "GODKeyGui"
+
+    Gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+    local Frame = Instance.new("Frame", Gui)
+
+    Frame.Size = UDim2.new(0,450,0,260)
+
+    Frame.Position = UDim2.new(0.5,-225,0.5,-130)
+
+    Frame.BackgroundColor3 = Color3.fromRGB(15,15,20)
+
+    Frame.BorderSizePixel = 0
+
+    Instance.new("UICorner", Frame).CornerRadius = UDim.new(0,25)
+
+    local Title = Instance.new("TextLabel", Frame)
+
+    Title.Size = UDim2.new(1,0,0,60)
+
+    Title.Text = "🔑 OG HUB KEY SYSTEM"
+
+    Title.Font = Enum.Font.GothamBold
+
+    Title.TextSize = 28
+
+    Title.TextColor3 = Color3.fromRGB(255,255,255)
+
+    Title.BackgroundTransparency = 1
+
+    -- Texto informativo de 24 horas
+
+    local InfoLabel = Instance.new("TextLabel", Frame)
+
+    InfoLabel.Size = UDim2.new(1, -20, 0, 20)
+
+    InfoLabel.Position = UDim2.new(0, 10, 0, 60)
+
+    InfoLabel.Text = "⏰ La key dura 24 horas"
+
+    InfoLabel.Font = Enum.Font.Gotham
+
+    InfoLabel.TextSize = 14
+
+    InfoLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+
+    InfoLabel.BackgroundTransparency = 1
+
+    local Box = Instance.new("TextBox", Frame)
+
+    Box.Size = UDim2.new(0.85,0,0,45)
+
+    Box.Position = UDim2.new(0.075,0,0.55,0)
+
+    Box.PlaceholderText = "Enter your key here..."
+
+    Box.Text = ""
+
+    Box.TextColor3 = Color3.new(1,1,1)
+
+    Box.BackgroundColor3 = Color3.fromRGB(30,30,35)
+
+    Box.TextSize = 18
+
+    Instance.new("UICorner", Box).CornerRadius = UDim.new(0,12)
+
+    local Btn = Instance.new("TextButton", Frame)
+
+    Btn.Size = UDim2.new(0.6,0,0,45)
+
+    Btn.Position = UDim2.new(0.2,0,0.75,0)
+
+    Btn.Text = "UNLOCK HUB"
+
+    Btn.Font = Enum.Font.GothamBold
+
+    Btn.TextSize = 20
+
+    Btn.TextColor3 = Color3.new(1,1,1)
+
+    Btn.BackgroundColor3 = Color3.fromRGB(0,150,255)
+
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0,12)
+
+    Drag(Frame)
+
+    Btn.MouseButton1Click:Connect(function()
+
+        if Box.Text == CorrectKey then
+
+            -- Guardar la key con timestamp
+
+            saveKeyData()
+
+            Gui:Destroy()
+
+            LoadHub()
+
+        else
+
+            Btn.Text = "❌ WRONG KEY"
+
+            task.wait(1)
+
+            Btn.Text = "UNLOCK HUB"
+
+        end
+
+    end)
+
+end
+
+-- VERIFICACIÓN INICIAL
+
+KeyGui()
